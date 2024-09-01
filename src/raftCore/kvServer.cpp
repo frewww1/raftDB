@@ -77,6 +77,7 @@ void KvServer::ExecutePutOpOnKVDB(Op op) {
 
 // 处理来自clerk的Get RPC
 void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetReply *reply) {
+  //将rpc的请求组装成OP
   Op op;
   op.Operation = "Get";
   op.Key = args->key();
@@ -279,6 +280,7 @@ void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
 }
 
 void KvServer::ReadRaftApplyCommandLoop() {
+  //负责消费通道的信息
   while (true) {
     //如果只操作applyChan不用拿锁，因为applyChan自己带锁
     auto message = applyChan->Pop();  //阻塞弹出
@@ -375,6 +377,7 @@ void KvServer::Get(google::protobuf::RpcController *controller, const ::raftKVRp
 }
 
 KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, short port) : m_skipList(6) {
+  //共享指针指向Persister对象
   std::shared_ptr<Persister> persister = std::make_shared<Persister>(me);
 
   m_me = me;
@@ -424,6 +427,7 @@ KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, shor
     }
     std::string otherNodeIp = ipPortVt[i].first;
     short otherNodePort = ipPortVt[i].second;
+    //维护一个rpc连接
     auto *rpc = new RaftRpcUtil(otherNodeIp, otherNodePort);
     servers.push_back(std::shared_ptr<RaftRpcUtil>(rpc));
 

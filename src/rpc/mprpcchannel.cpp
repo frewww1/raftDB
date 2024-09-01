@@ -125,6 +125,7 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
 }
 
 bool MprpcChannel::newConnect(const char* ip, uint16_t port, string* errMsg) {
+  //简历socket连接，并将fd存到MprpcChannel
   int clientfd = socket(AF_INET, SOCK_STREAM, 0);
   if (-1 == clientfd) {
     char errtxt[512] = {0};

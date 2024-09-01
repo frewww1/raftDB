@@ -20,10 +20,15 @@ int main(int argc, char **argv) {
   int c = 0;
   int nodeNum = 0;
   std::string configFileName;
+  //随机数种子
   std::random_device rd;
+  //随机数生成器
   std::mt19937 gen(rd());
+  //用来生成随机整数
   std::uniform_int_distribution<> dis(10000, 29999);
+  //生成一个随机端口
   unsigned short startPort = dis(gen);
+  //读命令行
   while ((c = getopt(argc, argv, "n:f:")) != -1) {
     switch (c) {
       case 'n':
@@ -37,6 +42,7 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
   }
+  //目的是清空配置文件
   std::ofstream file(configFileName, std::ios::out | std::ios::app);
   file.close();
   file = std::ofstream(configFileName, std::ios::out | std::ios::trunc);
@@ -47,7 +53,9 @@ int main(int argc, char **argv) {
     std::cout << "无法打开 " << configFileName << std::endl;
     exit(EXIT_FAILURE);
   }
+
   for (int i = 0; i < nodeNum; i++) {
+    //获取新的port
     short port = startPort + static_cast<short>(i);
     std::cout << "start to create raftkv node:" << i << "    port:" << port << " pid:" << getpid() << std::endl;
     pid_t pid = fork();  // 创建新进程

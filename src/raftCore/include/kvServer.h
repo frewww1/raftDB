@@ -24,23 +24,30 @@
 
 class KvServer : raftKVRpcProctoc::kvServerRpc {
  private:
+  //互斥锁
   std::mutex m_mtx;
+  //节点id
   int m_me;
+  //指向Raft的共享指针
   std::shared_ptr<Raft> m_raftNode;
+  //指向LockQueue<ApplyMsg>的共享指针
   std::shared_ptr<LockQueue<ApplyMsg> > applyChan;  // kvServer和raft节点的通信管道
+  //Raft状态最大的大小
   int m_maxRaftState;                               // snapshot if log grows this big
 
-  // Your definitions here.
+  // 存放序列化后的数据
   std::string m_serializedKVData;  // todo ： 序列化后的kv数据，理论上可以不用，但是目前没有找到特别好的替代方法
+  //跳表?
   SkipList<std::string, std::string> m_skipList;
+  //哈希表，kv数据库
   std::unordered_map<std::string, std::string> m_kvDB;
-
+  //哈希表?
   std::unordered_map<int, LockQueue<Op> *> waitApplyCh;
   // index(raft) -> chan  //？？？字段含义   waitApplyCh是一个map，键是int，值是Op类型的管道
 
   std::unordered_map<std::string, int> m_lastRequestId;  // clientid -> requestID  //一个kV服务器可能连接多个client
 
-  // last SnapShot point , raftIndex
+  // 最后一个快照点
   int m_lastSnapShotRaftLogIndex;
 
  public:
@@ -112,7 +119,9 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
   }
 
   std::string getSnapshotData() {
+    //从跳表取数据
     m_serializedKVData = m_skipList.dump_file();
+    //将对象数据序列化到字符串流中
     std::stringstream ss;
     boost::archive::text_oarchive oa(ss);
     oa << *this;

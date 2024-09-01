@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
   std::string ip = "127.0.1.1";
   short port = 7788;
 
-  // 演示调用远程发布的rpc方法Login
+  // 客户端注册桩，需要一个连接，即channel
   fixbug::FiendServiceRpc_Stub stub(
       new MprpcChannel(ip, port, true));  //注册进自己写的channel类，channel类用于自定义发送格式和负责序列化等操作
   // rpc方法的请求参数

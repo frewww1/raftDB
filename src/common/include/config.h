@@ -11,8 +11,8 @@ const int debugMul = 1;  // 时间单位：time.Millisecond，不同网络环境
 const int HeartBeatTimeout = 25 * debugMul;  // 心跳时间一般要比选举超时小一个数量级
 const int ApplyInterval = 10 * debugMul;     //
 
-const int minRandomizedElectionTime = 300 * debugMul;  // ms
-const int maxRandomizedElectionTime = 500 * debugMul;  // ms
+const int minRandomizedElectionTime = 300 * debugMul;  // 最小超时时间
+const int maxRandomizedElectionTime = 500 * debugMul;  // 最大超时时间
 
 const int CONSENSUS_TIMEOUT = 500 * debugMul;  // ms
 
