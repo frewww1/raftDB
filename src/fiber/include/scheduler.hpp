@@ -15,6 +15,8 @@
 
 namespace monsoon {
 // 调度任务
+//可以用协程类或者方法构建任务
+//还可以清空任务
 class SchedulerTask {
  public:
   friend class Scheduler;

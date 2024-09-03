@@ -50,6 +50,10 @@ Fiber::ptr Fiber::GetThis() {
 // 有参构造，并为新的子协程创建栈空间
 Fiber::Fiber(std::function<void()> cb, size_t stacksize, bool run_inscheduler)
     : id_(cur_fiber_id++), cb_(cb), isRunInScheduler_(run_inscheduler) {
+  //初始化一个协程需要，一个方法，栈空间大小
+  //1.分配栈空间
+  //2.设置协程的上下文，并设置同一个方法（该方法是去执行当前线程上的协程的方法）
+
   ++fiber_count;
   stackSize_ = stacksize > 0 ? stacksize : g_fiber_stack_size;
   stack_ptr = StackAllocator::Alloc(stackSize_);

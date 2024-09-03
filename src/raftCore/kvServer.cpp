@@ -377,7 +377,7 @@ void KvServer::Get(google::protobuf::RpcController *controller, const ::raftKVRp
 }
 
 KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, short port) : m_skipList(6) {
-  //共享指针指向Persister对象
+  //Persister对象
   std::shared_ptr<Persister> persister = std::make_shared<Persister>(me);
 
   m_me = me;

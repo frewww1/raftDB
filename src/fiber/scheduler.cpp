@@ -62,6 +62,7 @@ void Scheduler::start() {
     return;
   }
   CondPanic(threadPool_.empty(), "thread pool is not empty");
+  //创建线程池
   threadPool_.resize(threadCnt_);
   for (size_t i = 0; i < threadCnt_; i++) {
     threadPool_[i].reset(new Thread(std::bind(&Scheduler::run, this), name_ + "_" + std::to_string(i)));

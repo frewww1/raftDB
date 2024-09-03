@@ -34,7 +34,9 @@ void FdContext::triggerEvent(Event event) {
 }
 
 IOManager::IOManager(size_t threads, bool use_caller, const std::string &name) : Scheduler(threads, use_caller, name) {
+  //epoll实例
   epfd_ = epoll_create(5000);
+  //创建一个管道
   int ret = pipe(tickleFds_);
   CondPanic(ret == 0, "pipe error");
 
@@ -88,11 +90,13 @@ int IOManager::addEvent(int fd, Event event, std::function<void()> cb) {
   Mutex::Lock ctxLock(fd_ctx->mutex);
   CondPanic(!(fd_ctx->events & event), "addevent error, fd = " + fd);
 
+  //获取epoll操作
   int op = fd_ctx->events ? EPOLL_CTL_MOD : EPOLL_CTL_ADD;
   epoll_event epevent;
   epevent.events = EPOLLET | fd_ctx->events | event;
-  epevent.data.ptr = fd_ctx;
+  epevent.data.ptr = fd_ctx; // ??
 
+  //添加事件
   int ret = epoll_ctl(epfd_, op, fd, &epevent);
   if (ret) {
     std::cout << "addevent: epoll ctl error" << std::endl;
@@ -258,6 +262,7 @@ void IOManager::idle() {
       if (next_timeout != ~0ull) {
         next_timeout = std::min((int)next_timeout, MAX_TIMEOUT);
       } else {
+        //当前没有时间事件
         next_timeout = MAX_TIMEOUT;
       }
       // 阻塞等待事件就绪
@@ -275,7 +280,7 @@ void IOManager::idle() {
       }
     } while (true);
 
-    // 收集所有超时定时器，执行回调函数
+    // 收集所有超时定时器，执行时间的回调函数
     std::vector<std::function<void()>> cbs;
     listExpiredCb(cbs);
     if (!cbs.empty()) {
@@ -361,6 +366,7 @@ bool IOManager::stopping(uint64_t &timeout) {
 }
 
 void IOManager::contextResize(size_t size) {
+  //一个哈希表用来装事件上下文的
   fdContexts_.resize(size);
   for (size_t i = 0; i < fdContexts_.size(); i++) {
     if (!fdContexts_[i]) {

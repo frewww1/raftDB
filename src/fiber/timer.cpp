@@ -117,6 +117,7 @@ uint64_t TimerManager::getNextTimer() {
 }
 
 void TimerManager::listExpiredCb(std::vector<std::function<void()>> &cbs) {
+  //获取应该要回调的方法，并且做一些其他逻辑？
   uint64_t now_ms = GetElapsedMS();
   std::vector<Timer::ptr> expired;
   {
@@ -129,10 +130,12 @@ void TimerManager::listExpiredCb(std::vector<std::function<void()>> &cbs) {
   if (timers_.empty()) {
     return;
   }
+  //检测时间回滚
   bool rollover = false;
   if (detectClockRolllover(now_ms)) {
     rollover = true;
   }
+  //如果没有回滚并且没有需要执行的时间事件 就结束
   if (!rollover && ((*timers_.begin())->next_ > now_ms)) {
     return;
   }
@@ -171,6 +174,7 @@ void TimerManager::addTimer(Timer::ptr val, RWMutex::WriteLock &lock) {
 }
 
 bool TimerManager::detectClockRolllover(uint64_t now_ms) {
+  //时间回滚检测
   bool rollover = false;
   if (now_ms < previouseTime_ && now_ms < (previouseTime_ - 60 * 60 * 1000)) {
     rollover = true;

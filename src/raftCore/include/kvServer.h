@@ -56,15 +56,15 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
   KvServer(int me, int maxraftstate, std::string nodeInforFileName, short port);
 
   void StartKVServer();
-
+  //打印数据库详情
   void DprintfKVDB();
-
+  //存入数据
   void ExecuteAppendOpOnKVDB(Op op);
-
+  //获取数据
   void ExecuteGetOpOnKVDB(Op op, std::string *value, bool *exist);
-
+  //存入数据
   void ExecutePutOpOnKVDB(Op op);
-
+  //获取
   void Get(const raftKVRpcProctoc::GetArgs *args,
            raftKVRpcProctoc::GetReply
                *reply);  //将 GetArgs 改为rpc调用的，因为是远程客户端，即服务器宕机对客户端来说是无感的
@@ -76,7 +76,7 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
 
   bool ifRequestDuplicate(std::string ClientId, int RequestId);
 
-  // clerk 使用RPC远程调用
+  // 存入
   void PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcProctoc::PutAppendReply *reply);
 
   ////一直等待raft传来的applyCh

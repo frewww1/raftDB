@@ -51,14 +51,15 @@ void watch_io_read() {
 void test_io() {
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
   monsoon::CondPanic(sockfd > 0, "scoket should >0");
+  //设置文件描述符
   fcntl(sockfd, F_SETFL, O_NONBLOCK);
-
+  //设置服务器地址
   sockaddr_in servaddr;
   memset(&servaddr, 0, sizeof(servaddr));
   servaddr.sin_family = AF_INET;
   servaddr.sin_port = htons(80);
   inet_pton(AF_INET, "36.152.44.96", &servaddr.sin_addr.s_addr);
-
+  //连接
   int rt = connect(sockfd, (const sockaddr *)&servaddr, sizeof(servaddr));
   if (rt != 0) {
     if (errno == EINPROGRESS) {

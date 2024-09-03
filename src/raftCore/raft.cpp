@@ -987,35 +987,37 @@ void Raft::Start(Op command, int* newLogIndex, int* newLogTerm, bool* isLeader) 
 // for any long-running work.
 void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::shared_ptr<Persister> persister,
                 std::shared_ptr<LockQueue<ApplyMsg>> applyCh) {
+  //设置参数
   m_peers = peers;
   m_persister = persister;
   m_me = me;
-  // Your initialization code here (2A, 2B, 2C).
-  m_mtx.lock();
 
-  // applier
-  this->applyChan = applyCh;
+  m_mtx.lock();//锁
+
+  this->applyChan = applyCh; //设置参数
   //    rf.ApplyMsgQueue = make(chan ApplyMsg)
-  m_currentTerm = 0;
-  m_status = Follower;
-  m_commitIndex = 0;
-  m_lastApplied = 0;
-  m_logs.clear();
+
+  //设置raft状态
+  m_currentTerm = 0;  //当前任期
+  m_status = Follower;   //当前状态
+  m_commitIndex = 0;   //提交索引
+  m_lastApplied = 0;   //最后应用的日志索引
+  m_logs.clear();    //清空日志
   for (int i = 0; i < m_peers.size(); i++) {
-    m_matchIndex.push_back(0);
-    m_nextIndex.push_back(0);
+    m_matchIndex.push_back(0);    // 初始化 matchIndex
+    m_nextIndex.push_back(0);      // 初始化 nextIndex
   }
-  m_votedFor = -1;
+  m_votedFor = -1;    // 初始化投票目标
 
-  m_lastSnapshotIncludeIndex = 0;
-  m_lastSnapshotIncludeTerm = 0;
-  m_lastResetElectionTime = now();
-  m_lastResetHearBeatTime = now();
+  m_lastSnapshotIncludeIndex = 0;     // 初始化快照包含的最后索引
+  m_lastSnapshotIncludeTerm = 0;     // 初始化快照包含的最后任期
+  m_lastResetElectionTime = now();    // 初始化最后重置选举时间
+  m_lastResetHearBeatTime = now();    // 初始化最后重置心跳时间
 
-  // initialize from state persisted before a crash
+  // 从持久化存储中读取先前保存的状态
   readPersist(m_persister->ReadRaftState());
   if (m_lastSnapshotIncludeIndex > 0) {
-    m_lastApplied = m_lastSnapshotIncludeIndex;
+    m_lastApplied = m_lastSnapshotIncludeIndex;  //设置成快照的最后索引
     // rf.commitIndex = rf.lastSnapshotIncludeIndex   todo ：崩溃恢复为何不能读取commitIndex
   }
 
@@ -1024,6 +1026,7 @@ void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::sh
 
   m_mtx.unlock();
 
+  //创建一个io管理器
   m_ioManager = std::make_unique<monsoon::IOManager>(FIBER_THREAD_NUM, FIBER_USE_CALLER_THREAD);
 
   // start ticker fiber to start elections

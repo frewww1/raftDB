@@ -73,6 +73,7 @@ uint64_t FdCtx::getTimeout(int type) {
 FdManager::FdManager() { m_datas.resize(64); }
 
 FdCtx::ptr FdManager::get(int fd, bool auto_create) {
+  //获取fd的上下文
   if (fd == -1) {
     return nullptr;
   }
